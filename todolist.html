@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List </title>
+    <style>
+        body{
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: azure;
+            display:flex;
+            justify-content: center;
+            align-items: self-start;
+            height: 100vh;
+            padding-top: 50px;
+            margin: 0%;
+        }   
+        .todo{
+            background-color: white;
+            padding: 30px;
+            border-radius: 12%;
+            box-shadow: 0 4px 20px rgb(0,0,0,0.10);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1{
+            text-align: center;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 10px;
+            border: 2px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor:text
+        }
+        button{
+            padding: 10px 16px;
+            margin-left: 8px;
+            background-color: #1259d7;
+            color:white ;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        button:hover{
+            background-color: #1259a7;
+        }
+        ul{
+            list-style-type: none;
+            padding: 0;
+            margin-top: 20px;
+        }
+        li{
+            background-color: #bca8be;
+            padding: 12px 14px;
+            margin-bottom : 12px;
+            border-radius:6px;
+            display: flex ;
+            align-items: center ;
+            justify-content: center ;
+
+        }
+        .task-left{
+            flex-grow: 1;
+        }
+        .task-checkBox{
+            margin-right: 10px;
+        }
+        .task-text{
+            font-size:16px;
+            flex-grow: 1;
+        }
+        .edit-input{
+            flex-grow: 1;
+            margin-right: 10px;
+            padding: 6;
+            font-size: 16px;
+        }
+        .task-buttons button{
+            margin-left: 5px;
+            background-color: #683389;
+            
+        }
+        .done{
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="todo">
+        <h1>To-Do List</h1>
+        <div>
+            <input type="text" id="taskInput" placeholder="Enter Text">
+            <button onclick="addTask()"> Add Task</button>
+        </div>
+        <ul id="taskList">
+        </ul>
+    </div>
+    <script>
+        let tasks = []
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput.value.trim();
+            if (taskText !== '') {
+                tasks.push({ text: taskText, done: false });
+                displayTasks();
+                taskText = '';
+
+            }
+        }
+        function displayTasks() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = "";
+            tasks.forEach((task, index) => {
+                const li = document.createElement('li');
+                //leftDiv(CheckBox,Text)
+                const leftDiv = document.createElement('div');
+                leftDiv.className = 'task-left';
+
+                const checkBox = document.createElement('input');
+                checkBox.type = 'checkBox';
+                checkBox.className = 'task-checkBox';
+                checkBox.checked = task.done;
+                checkBox.onchange = () => toggleDone(index);
+
+                const taskSpan = document.createElement('span');
+                taskSpan.className = 'task-text';
+                taskSpan.textContent = task.text;
+
+                if(task.done){
+                    taskSpan.classList.add('done')
+                }
+                leftDiv.appendChild(checkBox);
+                leftDiv.appendChild(taskSpan);
+
+                //Buttons
+                const buttonContainer = document.createElement('div');
+                buttonContainer.className = 'task-buttons';
+
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.onclick = function () { enterEditMode(li, taskSpan, index) };
+
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = "Delete";
+                deleteButton.className = 'delete-btn';
+                deleteButton.onclick = function () {
+                    tasks.splice(index, 1);
+                    displayTasks();
+                }
+
+                buttonContainer.appendChild(editButton);
+                buttonContainer.appendChild(deleteButton);
+
+                li.appendChild(leftDiv);
+                li.appendChild(buttonContainer);
+                taskList.appendChild(li);
+            });
+        }
+
+        function enterEditMode(li, taskSpan, index) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.className = 'edit-input';
+            input.value = tasks[index].text;
+
+            const saveButton = document.createElement('button');
+            saveButton.textContent = 'Save';
+            saveButton.className = 'save-btn'
+            saveButton.onclick = function () {
+                const updatedText = input.value.trim();
+                if (updatedText !== "") {
+                    tasks[index].text = updatedText;
+                    displayTasks();
+                }
+            };
+
+            const cancelButton = document.createElement('button');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.onclick = function () {
+                displayTasks();
+            };
+
+            const leftDiv = li.querySelector('.task-left');
+            leftDiv.innerHTML = '';
+            leftDiv.appendChild(input);
+            const buttonContainer = li.querySelector('.task-buttons');
+            buttonContainer.innerHTML = "";
+            buttonContainer.appendChild(saveButton);
+            buttonContainer.appendChild(cancelButton);
+        }
+
+        function toggleDone(index){
+            tasks[index].done = !tasks[index].done;
+            displayTasks();
+        }
+    </script>
+</body>
+
+</html>
